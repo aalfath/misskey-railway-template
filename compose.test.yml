@@ -1,0 +1,24 @@
+# Local test only (mirrors the Railway template's variables).
+services:
+  misskey:
+    build: .
+    labels: { her: "2490" }
+    environment:
+      PORT: "3000"
+      MISSKEY_URL: http://localhost:42490
+      DATABASE_URL: postgresql://postgres:pgpass-test@db:5432/railway
+      REDIS_URL: redis://default:redispass-test@redis:6379
+      SETUP_PASSWORD: setup-test-123
+    ports: ["42490:3000"]
+    volumes: [files:/misskey/files]
+    depends_on: [db, redis]
+  db:
+    image: postgres:18-alpine
+    labels: { her: "2490" }
+    environment: { POSTGRES_PASSWORD: pgpass-test, POSTGRES_DB: railway }
+    volumes: [db:/var/lib/postgresql]
+  redis:
+    image: redis:8.2.1
+    labels: { her: "2490" }
+    command: ["redis-server", "--requirepass", "redispass-test"]
+volumes: { files: {}, db: {} }
